@@ -269,6 +269,8 @@ a.info-val:hover{text-decoration:underline}
 .form-foot small{color:var(--tinta-suave);max-width:28em}
 .form-status{margin-top:1.2rem;padding:1rem 1.2rem;border-radius:var(--r-sm);background:var(--verde-niebla);color:var(--verde-hondo);font-weight:500;display:none}
 .form-status.show{display:block}
+.form-status.error{background:#FDF3F2;color:#B03A2E}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 @media (max-width:880px){.contact-grid{grid-template-columns:1fr}}
 @media (max-width:560px){.fields{grid-template-columns:1fr}}
 
@@ -660,7 +662,7 @@ a.info-val:hover{text-decoration:underline}
     <div class="form-card">
       <h3 data-i18n="form.title">Solicita tu cotización</h3>
       <p data-i18n="form.text">Déjanos tus datos y el detalle de lo que necesitas.</p>
-      <form id="contact-form" novalidate>
+      <form id="contact-form" action="enviar-contacto.php" method="post" novalidate>
         <div class="fields">
           <div class="field">
             <label for="f-nombre" data-i18n="form.name">Nombre</label>
@@ -688,8 +690,12 @@ a.info-val:hover{text-decoration:underline}
             <span class="err" aria-live="polite"></span>
           </div>
         </div>
+        <div class="hp" aria-hidden="true">
+          <label for="f-website">Sitio web</label>
+          <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
         <div class="form-foot">
-          <small data-i18n="form.note">Al enviar, se abrirá tu aplicación de correo con el mensaje listo para contacto@cabagan.cl.</small>
+          <small data-i18n="form.note">Recibiremos tu solicitud en contacto@cabagan.cl y te responderemos a la brevedad.</small>
           <button type="submit" class="btn btn-cta" data-i18n="form.submit">Enviar solicitud</button>
         </div>
         <div class="form-status" id="form-status" role="status"></div>
@@ -975,7 +981,7 @@ const I18N_EN={
   'form.subjectPh':'E.g.: Legumes',
   'form.message':'Message',
   'form.messagePh':'Products, approximate volumes and delivery location',
-  'form.note':'When you submit, your email app will open with the message ready for contacto@cabagan.cl.',
+  'form.note':'We will receive your request at contacto@cabagan.cl and get back to you shortly.',
   'form.submit':'Send request',
 
   'footer.motto':'Import, packaging and distribution of non-perishable foods since 1990. Storing the future of humanity.',
@@ -995,8 +1001,9 @@ const UI={
     errPhone:'Revisa el número: usa solo dígitos, espacios o +.',
     errSubject:'Indica el asunto de tu consulta.',
     errMessage:'Cuéntanos qué necesitas (al menos 10 caracteres).',
-    mailName:'Nombre', mailEmail:'Correo', mailPhone:'Teléfono',
-    sent:'Listo. Abrimos tu correo con la solicitud preparada; solo falta presionar Enviar.'
+    sending:'Enviando…',
+    sent:'Solicitud enviada. Te contactaremos pronto.',
+    sendError:'No se pudo enviar la solicitud. Inténtalo nuevamente o escríbenos a contacto@cabagan.cl.'
   },
   en:{
     menuOpen:'Open menu', menuClose:'Close menu',
@@ -1007,8 +1014,9 @@ const UI={
     errPhone:'Check the number: use only digits, spaces or +.',
     errSubject:'Please enter the subject of your inquiry.',
     errMessage:'Tell us what you need (at least 10 characters).',
-    mailName:'Name', mailEmail:'Email', mailPhone:'Phone',
-    sent:'Done. We opened your email app with the request ready; just press Send.'
+    sending:'Sending…',
+    sent:'Request sent. We will contact you soon.',
+    sendError:'We could not send your request. Please try again or email us at contacto@cabagan.cl.'
   }
 };
 
@@ -1121,19 +1129,37 @@ const UI={
     const ok=r===true; field.classList.toggle('invalid',!ok); err.textContent=ok?'':r;
     el.setAttribute('aria-invalid',!ok); return ok;
   }
-  form.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('blur',()=>{ if(el.value) check(el) }));
-  form.addEventListener('submit',e=>{
-    e.preventDefault();
-    const els=[...form.querySelectorAll('input,textarea')];
-    const bad=els.filter(el=>!check(el));
-    if(bad.length){ bad[0].focus(); status.classList.remove('show'); return; }
-    const d=Object.fromEntries(new FormData(form));
-    /* Para conectar un servicio de formularios (Formspree, Getform, backend propio),
-       reemplace este bloque por un fetch() POST al endpoint correspondiente. */
-    const body=`${t('mailName')}: ${d.nombre}\n${t('mailEmail')}: ${d.email}\n${t('mailPhone')}: ${d.telefono||'-'}\n\n${d.mensaje}`;
-    window.location.href=`mailto:contacto@cabagan.cl?subject=${encodeURIComponent(d.asunto)}&body=${encodeURIComponent(body)}`;
-    status.textContent=t('sent');
+  const fieldEls=[...form.querySelectorAll('input,textarea')].filter(el=>rules[el.name]);
+  fieldEls.forEach(el=>el.addEventListener('blur',()=>{ if(el.value) check(el) }));
+  const submitBtn=form.querySelector('button[type="submit"]');
+  function showStatus(msg,isError){
+    status.textContent=msg;
+    status.classList.toggle('error',!!isError);
     status.classList.add('show');
+  }
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const bad=fieldEls.filter(el=>!check(el));
+    if(bad.length){ bad[0].focus(); status.classList.remove('show'); return; }
+    // Envío al servidor (cPanel): enviar-contacto.php responde JSON {success, message}
+    const data=new FormData(form);
+    data.append('lang',lang);
+    submitBtn.disabled=true;
+    showStatus(t('sending'),false);
+    try{
+      const res=await fetch(form.action,{method:'POST',body:data,headers:{'Accept':'application/json'}});
+      const json=await res.json().catch(()=>null);
+      if(res.ok&&json&&json.success){
+        form.reset();
+        showStatus(json.message||t('sent'),false);
+      }else{
+        showStatus((json&&json.message)||t('sendError'),true);
+      }
+    }catch(err){
+      showStatus(t('sendError'),true);
+    }finally{
+      submitBtn.disabled=false;
+    }
   });
 
   document.getElementById('year').textContent=new Date().getFullYear();
