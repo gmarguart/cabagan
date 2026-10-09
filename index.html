@@ -285,6 +285,7 @@ a.info-val:hover{text-decoration:underline}
 .footer a{text-decoration:none}
 .footer a:hover{color:#fff;text-decoration:underline}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.1);margin-top:48px;padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.9rem}
+.footer-credit{margin:1.2rem 0 0;text-align:center;font-size:.8rem;opacity:.75}
 @media (max-width:760px){.footer-grid{grid-template-columns:1fr 1fr}.footer-grid > div:first-child{grid-column:1/-1}}
 
 /* ---------- Movimiento: una sola entrada orquestada en el hero ---------- */
@@ -739,6 +740,7 @@ a.info-val:hover{text-decoration:underline}
       <span>© <span id="year">2026</span> Sociedad Distribuidora de Productos Cabagán Ltda.</span>
       <span><a href="#" data-i18n="footer.privacy">Política de privacidad</a> &nbsp;&nbsp; <a href="#" data-i18n="footer.terms">Términos y condiciones</a></span>
     </div>
+    <p class="footer-credit"><span data-i18n="footer.credit">Desarrollado por</span> <a href="https://gmarguart.github.io/" target="_blank" rel="noopener">Gmarguart</a></p>
   </div>
 </footer>
 
@@ -987,7 +989,8 @@ const I18N_EN={
   'footer.motto':'Import, packaging and distribution of non-perishable foods since 1990. Storing the future of humanity.',
   'footer.nav':'Navigation',
   'footer.privacy':'Privacy policy',
-  'footer.terms':'Terms and conditions'
+  'footer.terms':'Terms and conditions',
+  'footer.credit':'Developed by'
 };
 
 /* Textos generados por el script (mensajes, validaciones, etc.) */
