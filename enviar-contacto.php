@@ -49,6 +49,88 @@ function post_value($key, $limit, $multiline = false)
     return substr($value, 0, $limit);
 }
 
+/**
+ * Envía un correo de texto por SMTP autenticado (sin librerías externas).
+ * Devuelve true si el servidor lo aceptó; si no, registra el motivo en error_log.
+ */
+function smtp_send($cfg, $to, $subject, $body, $replyTo)
+{
+    $secure = isset($cfg['secure']) ? $cfg['secure'] : 'ssl';
+    $host = ($secure === 'ssl' ? 'ssl://' : 'tcp://') . $cfg['host'] . ':' . $cfg['port'];
+    $verify = !isset($cfg['verify_cert']) || $cfg['verify_cert'];
+    $context = stream_context_create(['ssl' => [
+        'verify_peer' => $verify,
+        'verify_peer_name' => $verify,
+        'allow_self_signed' => !$verify
+    ]]);
+
+    $socket = @stream_socket_client($host, $errno, $errstr, 15, STREAM_CLIENT_CONNECT, $context);
+    if (!$socket) {
+        error_log("enviar-contacto.php: no se pudo conectar a SMTP $host ($errno $errstr)");
+        return false;
+    }
+    stream_set_timeout($socket, 15);
+
+    $read = function () use ($socket) {
+        $data = '';
+        while (($line = fgets($socket, 515)) !== false) {
+            $data .= $line;
+            if (strlen($line) < 4 || $line[3] === ' ') {
+                break;
+            }
+        }
+        return $data;
+    };
+    // $label se usa en el log en vez del comando (para no registrar usuario, contraseña ni el mensaje)
+    $step = function ($command, $expected, $label = null) use ($socket, $read) {
+        if ($command !== null) {
+            fwrite($socket, $command . "\r\n");
+        }
+        $reply = $read();
+        if (!in_array((int) substr($reply, 0, 3), (array) $expected, true)) {
+            $shown = $label !== null ? $label : ($command !== null ? $command : 'saludo inicial');
+            error_log('enviar-contacto.php: SMTP rechazó ' . $shown . ' -> ' . trim($reply));
+            return false;
+        }
+        return true;
+    };
+
+    $domain = substr(strrchr($cfg['user'], '@'), 1);
+    $ok = $step(null, 220) && $step('EHLO ' . $domain, 250);
+
+    if ($ok && $secure === 'tls') {
+        $ok = $step('STARTTLS', 220)
+            && stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)
+            && $step('EHLO ' . $domain, 250);
+    }
+
+    $headers = [
+        'Date: ' . date('r'),
+        'From: Cabagan <' . $cfg['user'] . '>',
+        'To: <' . $to . '>',
+        'Reply-To: ' . $replyTo,
+        'Subject: ' . $subject,
+        'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . $domain . '>',
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'Content-Transfer-Encoding: base64'
+    ];
+    $data = implode("\r\n", $headers) . "\r\n\r\n" . rtrim(chunk_split(base64_encode($body), 76, "\r\n"));
+
+    $ok = $ok
+        && $step('AUTH LOGIN', 334)
+        && $step(base64_encode($cfg['user']), 334, 'usuario')
+        && $step(base64_encode($cfg['pass']), 235, 'contraseña')
+        && $step('MAIL FROM:<' . $cfg['user'] . '>', 250)
+        && $step('RCPT TO:<' . $to . '>', [250, 251])
+        && $step('DATA', 354)
+        && $step($data . "\r\n.", 250, 'contenido del mensaje');
+
+    fwrite($socket, "QUIT\r\n");
+    fclose($socket);
+    return $ok;
+}
+
 function text_length($value)
 {
     return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
@@ -101,6 +183,21 @@ $headers = [
     'X-Mailer: PHP/' . phpversion()
 ];
 
+// Si existe smtp-config.php (no se sube a GitHub), se envía por SMTP autenticado
+$smtpConfig = __DIR__ . '/smtp-config.php';
+if (is_file($smtpConfig)) {
+    $sent = smtp_send(require $smtpConfig, MAIL_TO, $mailSubject, $body, $email);
+    if (!$sent) {
+        respond(500, false, $texts[$lang]['error']);
+    }
+    respond(200, true, $texts[$lang]['ok']);
+}
+
+if (!function_exists('mail')) {
+    error_log('enviar-contacto.php: la función mail() está deshabilitada en este servidor.');
+    respond(500, false, $texts[$lang]['error']);
+}
+
 $sent = mail(
     MAIL_TO,
     $mailSubject,
@@ -109,7 +206,14 @@ $sent = mail(
     '-f' . MAIL_FROM
 );
 
+// Algunos servidores rechazan el parámetro -f: se reintenta sin él
 if (!$sent) {
+    $sent = mail(MAIL_TO, $mailSubject, $body, implode("\r\n", $headers));
+}
+
+if (!$sent) {
+    $last = error_get_last();
+    error_log('enviar-contacto.php: mail() falló. ' . ($last ? $last['message'] : 'Sin detalle del servidor.'));
     respond(500, false, $texts[$lang]['error']);
 }
 
