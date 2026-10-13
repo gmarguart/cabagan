@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-const MAIL_TO = 'contacto@cabagan.cl';
-const MAIL_FROM = 'contacto@cabagan.cl';
+const MAIL_TO = 'gestion@cabagan.cl';
+const MAIL_FROM = 'gestion@cabagan.cl';
 
 $lang = (isset($_POST['lang']) && $_POST['lang'] === 'en') ? 'en' : 'es';
 
@@ -10,13 +10,13 @@ $texts = [
     'es' => [
         'method' => 'Método no permitido.',
         'invalid' => 'Revisa los datos: nombre, correo válido, asunto y mensaje son obligatorios.',
-        'error' => 'No se pudo enviar la solicitud. Inténtalo nuevamente o escríbenos a contacto@cabagan.cl.',
+        'error' => 'No se pudo enviar la solicitud. Inténtalo nuevamente o escríbenos a gestion@cabagan.cl.',
         'ok' => 'Solicitud enviada. Te contactaremos pronto.'
     ],
     'en' => [
         'method' => 'Method not allowed.',
         'invalid' => 'Please check your details: name, a valid email, subject and message are required.',
-        'error' => 'We could not send your request. Please try again or email us at contacto@cabagan.cl.',
+        'error' => 'We could not send your request. Please try again or email us at gestion@cabagan.cl.',
         'ok' => 'Request sent. We will contact you soon.'
     ]
 ];
