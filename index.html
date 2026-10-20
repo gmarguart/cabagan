@@ -237,6 +237,11 @@ p{margin:0}
 .import li{padding:.38rem .8rem;border:1px solid rgba(255,255,255,.2);border-radius:999px;font-size:.93rem}
 @media (max-width:980px){.trade{grid-template-columns:1fr}}
 
+/* ---------- Envasado ---------- */
+.packing .card{background:var(--superficie)}
+.packing .card-img{aspect-ratio:4/5}
+.step-num{font-size:.85rem;font-weight:700;color:var(--verde-brote);margin-bottom:.35rem}
+
 /* ---------- Contacto ---------- */
 .contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:24px;align-items:stretch}
 .contact-info{background:var(--verde-bosque);color:#E4EFDF;border-radius:var(--r-lg);padding:clamp(28px,4vw,44px);display:flex;flex-direction:column}
@@ -319,6 +324,7 @@ a.info-val:hover{text-decoration:underline}
             <li><a href="#inicio" data-i18n="nav.home">Inicio</a></li>
             <li><a href="#nosotros" data-i18n="nav.about">Nosotros</a></li>
             <li><a href="#productos" data-i18n="nav.products">Productos</a></li>
+            <li><a href="#envasado" data-i18n="nav.packing">Envasado</a></li>
             <li><a href="#contacto" data-i18n="nav.contact">Contacto</a></li>
           </ul>
         </nav>
@@ -625,6 +631,72 @@ a.info-val:hover{text-decoration:underline}
   </div>
 </section>
 
+<!-- ================= ENVASADO ================= -->
+<section class="section packing" id="envasado">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 data-i18n="packing.title">Nuestro proceso de envasado</h2>
+      <p data-i18n="packing.lead">En nuestra planta de San Bernardo envasamos con maquinaria automática, desde la dosificación del grano hasta el embalaje final, para productos de marca propia y de maquila.</p>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-1-dosificacion.jpg" width="720" height="960" loading="lazy" alt="Tolva de acero inoxidable que recibe el arroz para su dosificación" data-i18n-attr="alt:packing.1.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.1.step">Paso 1</div>
+          <h3 data-i18n="packing.1.title">Dosificación</h3>
+          <p class="card-desc" data-i18n="packing.1.desc">El grano llega a la tolva de acero inoxidable, que dosifica la cantidad exacta para cada bolsa.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-2-film.jpg" width="720" height="960" loading="lazy" alt="Envasadora vertical alimentada por una bobina de film plástico" data-i18n-attr="alt:packing.2.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.2.step">Paso 2</div>
+          <h3 data-i18n="packing.2.title">Alimentación de film</h3>
+          <p class="card-desc" data-i18n="packing.2.desc">La envasadora vertical toma el film desde la bobina para formar cada envase de forma continua.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-3-formado.jpg" width="720" height="960" loading="lazy" alt="Bolsas de arroz formándose y llenándose dentro de la envasadora" data-i18n-attr="alt:packing.3.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.3.step">Paso 3</div>
+          <h3 data-i18n="packing.3.title">Formado y llenado</h3>
+          <p class="card-desc" data-i18n="packing.3.desc">El film se convierte en bolsa y se llena con el producto ya dosificado.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-4-sellado.jpg" width="720" height="960" loading="lazy" alt="Bolsas de arroz selladas saliendo de la envasadora" data-i18n-attr="alt:packing.4.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.4.step">Paso 4</div>
+          <h3 data-i18n="packing.4.title">Sellado</h3>
+          <p class="card-desc" data-i18n="packing.4.desc">Cada bolsa se sella y se corta, lista para salir de la máquina con su etiqueta y código de barras.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-5-transporte.jpg" width="720" height="960" loading="lazy" alt="Bolsas de arroz avanzando por la cinta transportadora" data-i18n-attr="alt:packing.5.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.5.step">Paso 5</div>
+          <h3 data-i18n="packing.5.title">Transporte</h3>
+          <p class="card-desc" data-i18n="packing.5.desc">Las bolsas avanzan por la cinta transportadora hacia la etapa de embalaje.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-img"><img src="img/envasado-6-embalaje.jpg" width="720" height="960" loading="lazy" alt="Fardo con bolsas de arroz agrupadas sobre la cinta transportadora" data-i18n-attr="alt:packing.6.alt"></div>
+        <div class="card-body">
+          <div class="step-num" data-i18n="packing.6.step">Paso 6</div>
+          <h3 data-i18n="packing.6.title">Embalaje</h3>
+          <p class="card-desc" data-i18n="packing.6.desc">Las bolsas se agrupan en fardos, listas para almacenarse y despacharse a nuestros clientes.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
 <!-- ================= CONTACTO ================= -->
 <section class="section" id="contacto">
   <div class="wrap contact-grid">
@@ -724,6 +796,7 @@ a.info-val:hover{text-decoration:underline}
           <li><a href="#inicio" data-i18n="nav.home">Inicio</a></li>
           <li><a href="#nosotros" data-i18n="nav.about">Nosotros</a></li>
           <li><a href="#productos" data-i18n="nav.products">Productos</a></li>
+          <li><a href="#envasado" data-i18n="nav.packing">Envasado</a></li>
           <li><a href="#contacto" data-i18n="nav.contact">Contacto</a></li>
         </ul>
       </div>
@@ -760,6 +833,7 @@ const I18N_EN={
   'nav.home':'Home',
   'nav.about':'About us',
   'nav.products':'Products',
+  'nav.packing':'Packaging',
   'nav.contact':'Contact',
   'cta.quote':'Request a quote',
 
@@ -964,6 +1038,33 @@ const I18N_EN={
   'country.de':'Germany',
   'country.ca':'Canada',
 
+  'packing.title':'Our packaging process',
+  'packing.lead':'At our San Bernardo plant we pack with automated machinery, from grain dosing to final bundling, for both our own brands and private-label products.',
+  'packing.1.step':'Step 1',
+  'packing.1.title':'Dosing',
+  'packing.1.desc':'Grain reaches the stainless steel hopper, which doses the exact amount for each bag.',
+  'packing.1.alt':'Stainless steel hopper receiving rice for dosing',
+  'packing.2.step':'Step 2',
+  'packing.2.title':'Film feeding',
+  'packing.2.desc':'The vertical packaging machine draws film from the roll to form each package continuously.',
+  'packing.2.alt':'Vertical packaging machine fed by a roll of plastic film',
+  'packing.3.step':'Step 3',
+  'packing.3.title':'Forming and filling',
+  'packing.3.desc':'The film is shaped into a bag and filled with the dosed product.',
+  'packing.3.alt':'Rice bags being formed and filled inside the packaging machine',
+  'packing.4.step':'Step 4',
+  'packing.4.title':'Sealing',
+  'packing.4.desc':'Each bag is sealed and cut, ready to leave the machine with its label and barcode.',
+  'packing.4.alt':'Sealed rice bags leaving the packaging machine',
+  'packing.5.step':'Step 5',
+  'packing.5.title':'Conveying',
+  'packing.5.desc':'Bags move along the conveyor belt to the bundling stage.',
+  'packing.5.alt':'Rice bags moving along the conveyor belt',
+  'packing.6.step':'Step 6',
+  'packing.6.title':'Bundling',
+  'packing.6.desc':'Bags are grouped into bundles, ready to be stored and shipped to our customers.',
+  'packing.6.alt':'Bundle of grouped rice bags on the conveyor belt',
+
   'contact.title':'Let’s talk about your next order',
   'contact.text':'Tell us which products and volumes you need, and we’ll send you a quote with personalized service.',
   'contact.email':'Email',
@@ -1089,7 +1190,7 @@ const UI={
   document.querySelectorAll('main section[id]').forEach(s=>obs.observe(s));
 
   // Filtros de productos
-  const filters=document.querySelectorAll('.filter'), cards=document.querySelectorAll('.card');
+  const filters=document.querySelectorAll('.filter'), cards=document.querySelectorAll('#product-grid .card');
   filters.forEach(btn=>btn.addEventListener('click',()=>{
     filters.forEach(b=>b.setAttribute('aria-pressed',b===btn));
     const f=btn.dataset.filter;
